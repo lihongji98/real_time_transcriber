@@ -37,29 +37,38 @@ int main() {
     output_temp.release();
 
 
-    encoder_input_shapes = {1, 128 };
-    decoder_input_shapes = {1, 1 };
+    encoder_input_shapes = { 1, 128 };
+    decoder_input_shapes = { 1, 3 };
     
 
     std::vector<int64_t> encoder_input = { 1, 20, 88, 749, 21, 178, 10867, 46, 314, 56, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::vector<int64_t> decoder_input = { 1,};
+    std::vector<int64_t> decoder_input = { 1, 21, 104};
 
     auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
 
     input_tensors.emplace_back(Ort::Value::CreateTensor<int64_t>(memory_info, encoder_input.data(), encoder_input.size(), encoder_input_shapes.data(), encoder_input_shapes.size()));
     input_tensors.emplace_back(Ort::Value::CreateTensor<int64_t>(memory_info, decoder_input.data(), decoder_input.size(), decoder_input_shapes.data(), decoder_input_shapes.size()));
 
-    std::cout << encoder_input_shapes.size() << " " << decoder_input_shapes.size() << " " << input_tensors.size() << " " << output_name.size() << std::endl;
-
     std::vector<Ort::Value> output_tensors = session.Run(runOptions, input_names.data(), input_tensors.data(), input_tensors.size(), output_name.data(), output_name.size());
+    
+    Ort::Value& output_tensor = output_tensors[0];
 
-    std::cout << "Number of output tensors: " << output_tensors.size() << std::endl;
+    Ort::TensorTypeAndShapeInfo output_info = output_tensor.GetTensorTypeAndShapeInfo();
+    size_t total_elements = output_info.GetElementCount();
 
-    for (size_t i = 0; i < output_tensors.size(); i++) {
-        std::cout << "Output tensor " << i << ":" << std::endl;
-        printTensor(output_tensors[i]);
-        std::cout << std::endl;
+    if (total_elements < 16000) {
+        std::cerr << "The output tensor does not have enough elements!" << std::endl;
+        return -1;
     }
+
+    float* output_data = output_tensor.GetTensorMutableData<float>();
+    std::vector<float> predict_token_vector(output_data + total_elements - 16000, output_data + total_elements);
+    softmax(predict_token_vector);
+    size_t next_token = argsort_max(predict_token_vector);
+
+    
+    std::cout << next_token << std::endl;
+ 
 
     std::cout << "Session Run is completed..." << std::endl;
 }

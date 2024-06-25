@@ -2,53 +2,31 @@
 #include <vector>
 #include <algorithm>
 #include <random>
-#include <onnxruntime_cxx_api.h>
 #include <iostream>
+#include <numeric>
 
 
-void sayHello() {
-    std::cout << "Hello from functions.cpp!" << std::endl;
+void softmax(std::vector<float>& input) {
+    std::vector<float> exp_values(input.size());
+    std::transform(input.begin(), input.end(), exp_values.begin(), [](float x) {
+        return std::exp(x);
+        });
+
+    float sum_exp = std::accumulate(exp_values.begin(), exp_values.end(), 0.0f);
+
+    std::transform(exp_values.begin(), exp_values.end(), exp_values.begin(), [sum_exp](float x) {
+        return x / sum_exp;
+        });
+
+    input = std::move(exp_values);
 }
 
-void printTensor(const Ort::Value& tensor) {
-    // Get tensor info
-    Ort::TensorTypeAndShapeInfo info = tensor.GetTensorTypeAndShapeInfo();
-    std::vector<int64_t> shape = info.GetShape();
-    size_t num_elements = info.GetElementCount();
 
-    // Print shape
-    std::cout << "Tensor shape: [";
-    for (size_t i = 0; i < shape.size(); ++i) {
-        std::cout << shape[i];
-        if (i < shape.size() - 1) std::cout << ", ";
+size_t argsort_max(const std::vector<float>& output_probs) {
+    if (output_probs.empty()) {
+        throw std::runtime_error("Vector is empty");
     }
-    std::cout << "]" << std::endl;
+    size_t max_element_index = std::distance(output_probs.begin(), std::max_element(output_probs.begin(), output_probs.end()));
 
-    // Print data
-    std::cout << "Tensor data: ";
-    if (tensor.IsTensor()) {
-        switch (info.GetElementType()) {
-        case ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT: {
-            const float* data = tensor.GetTensorData<float>();
-            for (size_t i = 0; i < std::min(num_elements, size_t(10)); ++i) {
-                std::cout << data[i] << " ";
-            }
-            break;
-        }
-        case ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64: {
-            const int64_t* data = tensor.GetTensorData<int64_t>();
-            for (size_t i = 0; i < std::min(num_elements, size_t(10)); ++i) {
-                std::cout << data[i] << " ";
-            }
-            break;
-        }
-                                                // Add more cases for other data types as needed
-        default:
-            std::cout << "Unsupported data type";
-        }
-    }
-    else {
-        std::cout << "Not a tensor";
-    }
-    std::cout << (num_elements > 10 ? "... (truncated)" : "") << std::endl;
+    return max_element_index;
 }
