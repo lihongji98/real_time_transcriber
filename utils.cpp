@@ -4,6 +4,10 @@
 #include <random>
 #include <iostream>
 #include <numeric>
+#include <fstream>
+#include <string>
+#include <unordered_map>
+#include <sstream>
 
 
 void softmax(std::vector<float>& input) {
@@ -29,4 +33,29 @@ size_t argsort_max(const std::vector<float>& output_probs) {
     size_t max_element_index = std::distance(output_probs.begin(), std::max_element(output_probs.begin(), output_probs.end()));
 
     return max_element_index;
+}
+
+
+std::unordered_map<int, std::string> load_vocab(const std::string& file_path) {
+    std::unordered_map<int, std::string> vocab;
+    std::ifstream file(file_path);
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << file_path << std::endl;
+        return vocab;
+    }
+
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string word;
+        int index;
+
+        if (std::getline(iss, word, '\t') && iss >> index) {
+            vocab[index] = word;
+        }
+    }
+
+    file.close();
+    return vocab;
 }

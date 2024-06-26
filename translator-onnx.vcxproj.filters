@@ -32,4 +32,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="voc\voc_en.txt" />
+    <Text Include="voc\voc_no.txt" />
+  </ItemGroup>
 </Project>

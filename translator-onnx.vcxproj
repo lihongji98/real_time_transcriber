@@ -141,6 +141,10 @@
   <ItemGroup>
     <ClInclude Include="utils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="voc\voc_en.txt" />
+    <Text Include="voc\voc_no.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\Microsoft.ML.OnnxRuntime.1.18.0\build\native\Microsoft.ML.OnnxRuntime.targets" Condition="Exists('packages\Microsoft.ML.OnnxRuntime.1.18.0\build\native\Microsoft.ML.OnnxRuntime.targets')" />
