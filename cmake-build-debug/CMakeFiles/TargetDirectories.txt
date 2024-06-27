@@ -1,0 +1,3 @@
+/Users/lihongji/dev/cpp-demo/cmake-build-debug/CMakeFiles/cpp_demo.dir
+/Users/lihongji/dev/cpp-demo/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/lihongji/dev/cpp-demo/cmake-build-debug/CMakeFiles/rebuild_cache.dir
