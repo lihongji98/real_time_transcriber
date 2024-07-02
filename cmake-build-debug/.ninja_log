@@ -1,7 +1,13 @@
 # ninja log v6
-6	583	1719449504368659087	CMakeFiles/cpp_demo.dir/src/utils.cpp.o	55866e4c35c95dc2
-4	720	1719449659254526297	CMakeFiles/cpp_demo.dir/src/main.cpp.o	119df20f02552055
-720	832	1719449659970707012	cpp_demo	596c9eb12b9cdb48
-3	55	1719490254144674885	build.ninja	f2b25a64aee740a4
-3	723	1719490361479136992	CMakeFiles/cpp_demo.dir/src/main.cpp.o	119df20f02552055
-723	842	1719490362198646939	cpp_demo	596c9eb12b9cdb48
+3	657	1719888554421488785	CMakeFiles/cpp_demo.dir/src/utils.cpp.o	386c9d1320c7dba5
+10	745	1719938344209674447	CMakeFiles/cpp_demo.dir/src/main.cpp.o	ac6a857ce697dafe
+745	879	1719938344944968321	cpp_demo	100ec3860d53049
+9	64	1719941317883788034	build.ninja	f2b25a64aee740a4
+4	782	1719951473900282312	CMakeFiles/cpp_demo.dir/src/main.cpp.o	ac6a857ce697dafe
+4	819	1719951473900839020	CMakeFiles/cpp_demo.dir/src/models.cpp.o	9e513633b4c1d5ae
+4	794	1719951525259543808	CMakeFiles/cpp_demo.dir/src/main.cpp.o	ac6a857ce697dafe
+4	841	1719951525259820600	CMakeFiles/cpp_demo.dir/src/models.cpp.o	9e513633b4c1d5ae
+841	943	1719951526096458781	cpp_demo	a83d012cfa6d5de6
+5	803	1719951576380408377	CMakeFiles/cpp_demo.dir/src/main.cpp.o	ac6a857ce697dafe
+5	920	1719951576380821752	CMakeFiles/cpp_demo.dir/src/models.cpp.o	9e513633b4c1d5ae
+920	1028	1719951577295687536	cpp_demo	a83d012cfa6d5de6

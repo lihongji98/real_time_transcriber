@@ -52,14 +52,21 @@ build cmake_object_order_depends_target_cpp_demo: phony || CMakeFiles/cpp_demo.d
 build CMakeFiles/cpp_demo.dir/src/main.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/cpp-demo/src/main.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/main.cpp.o.d
   FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
-  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include
+  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
 build CMakeFiles/cpp_demo.dir/src/utils.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/cpp-demo/src/utils.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/utils.cpp.o.d
   FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
-  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include
+  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include
+  OBJECT_DIR = CMakeFiles/cpp_demo.dir
+  OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
+
+build CMakeFiles/cpp_demo.dir/src/models.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/cpp-demo/src/models.cpp || cmake_object_order_depends_target_cpp_demo
+  DEP_FILE = CMakeFiles/cpp_demo.dir/src/models.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
@@ -71,9 +78,9 @@ build CMakeFiles/cpp_demo.dir/src/utils.cpp.o: CXX_COMPILER__cpp_demo_unscanned_
 #############################################
 # Link the executable cpp_demo
 
-build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib
+build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o CMakeFiles/cpp_demo.dir/src/models.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
-  LINK_LIBRARIES = -Wl,-rpath,/Users/lihongji/dev/dependency/onnxruntime/lib  /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib
+  LINK_LIBRARIES = -Wl,-rpath,/Users/lihongji/dev/dependency/onnxruntime/lib -Wl,-rpath,/Users/lihongji/dev/dependency/portaudio/build  /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib  /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   POST_BUILD = :
   PRE_LINK = :
