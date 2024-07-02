@@ -9,7 +9,7 @@ set(PORTAUDIO_ROOT "/Users/lihongji/dev/dependency/portaudio")
 include_directories("${ONNXRUNTIME_ROOT}/include")
 include_directories("${PORTAUDIO_ROOT}/include")
 
-add_executable(cpp_demo ./src/main.cpp
+add_executable(cpp_demo src/main.cpp
         src/utils.cpp
         src/models.cpp
         src/models.h
