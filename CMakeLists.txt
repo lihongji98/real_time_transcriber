@@ -24,6 +24,7 @@ find_package(Samplerate REQUIRED)
 
 add_executable(cpp_demo src/main.cpp
         src/utils.cpp
+        src/utils.h
         src/models.cpp
         src/models.h
         src/whisper_process.cpp
