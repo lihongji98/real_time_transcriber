@@ -178,29 +178,34 @@ std::vector<float> load_audio_data(const std::string& filename) {
     sf_read_short(file, audio_data_short.data(), audio_data_short.size());
     sf_close(file);
 
+    if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_PCM_16) {
+        sf_close(file);
+        throw std::runtime_error("Audio file is not 16-bit PCM");
+    }
+
+    // Convert to mono if stereo
+    if (sfinfo.channels == 2) {
+        for (size_t i = 0; i < audio_data_short.size() / 2; ++i) {
+            audio_data_short[i] = (audio_data_short[i * 2] + audio_data_short[i * 2 + 1]);
+        }
+        audio_data_short.resize(audio_data_short.size() / 2);
+    }
+
     // Convert to float and normalize
     std::vector<float> audio_data(audio_data_short.size());
     for (size_t i = 0; i < audio_data.size(); ++i) {
         audio_data[i] = static_cast<float>(audio_data_short[i]) / 32768.0f;
     }
 
-    // Convert to mono if stereo
-    if (sfinfo.channels == 2) {
-        for (size_t i = 0; i < audio_data.size() / 2; ++i) {
-            audio_data[i] = (audio_data[i * 2] + audio_data[i * 2 + 1]) / 2.0f;
-        }
-        audio_data.resize(audio_data.size() / 2);
-    }
-
     std::vector<float> resampled_audio;
     if (sfinfo.samplerate != SAMPLE_RATE) {
         double ratio = static_cast<double>(SAMPLE_RATE) / sfinfo.samplerate;
-        size_t new_size = static_cast<size_t>(std::ceil(audio_data.size() * ratio));
+        auto new_size = static_cast<size_t>(std::ceil(audio_data.size() * ratio));
         resampled_audio.resize(new_size);
 
         for (size_t i = 0; i < new_size; ++i) {
             double src_index = i / ratio;
-            size_t src_index_int = static_cast<size_t>(src_index);
+            auto src_index_int = static_cast<size_t>(src_index);
             double frac = src_index - src_index_int;
 
             if (src_index_int + 1 < audio_data.size()) {
@@ -216,3 +221,4 @@ std::vector<float> load_audio_data(const std::string& filename) {
 
     return resampled_audio;
 }
+

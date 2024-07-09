@@ -22,7 +22,7 @@ std::vector<float> process_python_array(const std::vector<float>& input_vector, 
     std::vector<float> result_vector;
 
     npy_intp dimensions[1] = {static_cast<npy_intp>(input_vector.size())};
-    PyObject* py_array = PyArray_SimpleNewFromData(1, dimensions, NPY_FLOAT32, const_cast<float*>(input_vector.data()));
+    PyObject* py_array = PyArray_SimpleNewFromData(1, dimensions, NPY_FLOAT32, const_cast<npy_float32 *>(input_vector.data()));
 
     PyRun_SimpleString(
             "import sys\n"

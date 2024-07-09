@@ -77,13 +77,6 @@ build CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o: CXX_COMPILER__cpp_demo_
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
-build CMakeFiles/cpp_demo.dir/src/onnx_test.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/onnx_test.cpp || cmake_object_order_depends_target_cpp_demo
-  DEP_FILE = CMakeFiles/cpp_demo.dir/src/onnx_test.cpp.o.d
-  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
-  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
-  OBJECT_DIR = CMakeFiles/cpp_demo.dir
-  OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cpp_demo
@@ -92,7 +85,7 @@ build CMakeFiles/cpp_demo.dir/src/onnx_test.cpp.o: CXX_COMPILER__cpp_demo_unscan
 #############################################
 # Link the executable cpp_demo
 
-build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o CMakeFiles/cpp_demo.dir/src/models.cpp.o CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o CMakeFiles/cpp_demo.dir/src/onnx_test.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib /opt/homebrew/lib/libsndfile.1.0.37.dylib /opt/homebrew/lib/libsamplerate.dylib
+build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o CMakeFiles/cpp_demo.dir/src/models.cpp.o CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib /opt/homebrew/lib/libsndfile.1.0.37.dylib /opt/homebrew/lib/libsamplerate.dylib
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
   LINK_FLAGS = -Xlinker -undefined -Xlinker dynamic_lookup
   LINK_LIBRARIES = -Wl,-rpath,/Users/lihongji/dev/dependency/onnxruntime/lib -Wl,-rpath,/Users/lihongji/dev/dependency/portaudio/build -Wl,-rpath,/Users/lihongji/anaconda3/envs/ml/lib -Wl,-rpath,/opt/homebrew/lib  /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib  /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib  /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib  /opt/homebrew/lib/libsndfile.1.0.37.dylib  /opt/homebrew/lib/libsamplerate.dylib
