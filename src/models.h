@@ -1,24 +1,23 @@
+#pragma once
+
 #ifndef CPP_DEMO_MODELS_H
 #define CPP_DEMO_MODELS_H
 
 #include <iostream>
+#include <filesystem>
+
 #include "onnxruntime_cxx_api.h"
 #include "utils.h"
 
 class Transcriber {
 public:
-    Transcriber(const std::string& src_lang):
-        env(),
-        runOptions(Ort::RunOptions())
-        {
-        std::cout << "transcribing language: <" << src_lang << ">" << std::endl;
-        };
+    Transcriber(const std::string& src_lang): ort_env(), runOptions(Ort::RunOptions()){};
 
     void load_model(const std::string& model_path);
     std::vector<int64_t> infer(std::vector<float>& encoder_input);
 
 private:
-    Ort::Env env;
+    Ort::Env ort_env;
     Ort::RunOptions runOptions;
     Ort::Session session{nullptr};
     Ort::SessionOptions ort_session_options;
@@ -37,24 +36,18 @@ private:
 
 class Translator {
 public:
-    Translator(const std::string& src_lang, const std::string& trg_lang):
-            env(),
-            runOptions(Ort::RunOptions()),
-            voc_trg(load_vocab(trg_lang)),
-            voc_src(load_vocab(src_lang))
-    {};
+    Translator():
+            ort_env(),
+            runOptions(Ort::RunOptions()){};
 
     void load_model(const std::string& model_path);
-    std::string infer(std::vector<int64_t>& encoder_input);
+    std::vector<int> infer(std::vector<int64_t>& encoder_input);
 
 private:
-    Ort::Env env;
+    Ort::Env ort_env;
     Ort::RunOptions runOptions;
     Ort::Session session{nullptr};
     Ort::SessionOptions ort_session_options;
-
-    std::unordered_map<int, std::string> voc_trg;
-    std::unordered_map<int, std::string> voc_src;
 
     std::vector<const char*> input_names;
     std::vector<const char*> output_names;
@@ -65,5 +58,40 @@ private:
     std::vector<Ort::Value> input_tensors;
 };
 
+
+class Tokenizer{
+public:
+    std::string src_lang;
+    std::string trg_lang;
+
+    std::string src_sentence;
+
+    Tokenizer(const std::string& src, const std::string& trg);
+    ~Tokenizer();
+
+    std::string preprocessing(const std::string& lines_to_translate);
+    std::vector<int64_t> convert_token_to_id(const std::string& token_string);
+    std::vector<std::string> convert_id_to_token(const std::vector<int>& token_ids);
+    std::string postprocessing(const std::vector<std::string>& tokens);
+
+    std::string decode(const std::vector<int>& token_ids);
+
+private:
+    std::string root = std::filesystem::current_path().string();
+
+    std::string mosesdecoder_path = root + "/../transformer_onnx/tokenize_tool/mosesdecoder";
+    std::string vocab_path = root + "/../transformer_onnx/voc";
+
+    std::unordered_map<int, std::string> src_voc;
+    std::unordered_map<int, std::string> trg_voc;
+
+    std::unordered_map<std::string, int> reverse_src_voc;
+    std::unordered_map<std::string, int> reverse_trg_voc;
+
+    static std::string run_script(const std::vector<std::string>& script, const std::string& strings);
+};
+
+
+std::string transcribe(const std::vector<float>& audio_data);
 
 #endif //CPP_DEMO_MODELS_H

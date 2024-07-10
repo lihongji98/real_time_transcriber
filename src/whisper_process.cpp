@@ -1,7 +1,3 @@
-//
-// Created by Lihong Ji on 7/7/24.
-//
-
 #include "whisper_process.h"
 #include <iostream>
 
@@ -97,3 +93,5 @@ std::string process_token_ids(const std::vector<int64_t>& token_ids, const std::
 
     return tokens;
 }
+
+

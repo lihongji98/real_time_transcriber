@@ -1,17 +1,10 @@
-#include <cmath>
-#include <vector>
-#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <fstream>
-#include <cstring>
-#include <string>
-#include <unordered_map>
 #include <sstream>
 #include <portaudio.h>
-#include <stdexcept>
-#include <memory>
 #include <sndfile.h>
+#include <variant>
 
 
 const int SAMPLE_RATE = 16000;
@@ -46,10 +39,13 @@ size_t argsort_max(const std::vector<float>& output_probs) {
 }
 
 
-std::unordered_map<int, std::string> load_vocab(const std::string& file_path) {
-    std::unordered_map<int, std::string> vocab;
+std::variant<std::unordered_map<int, std::string>,std::unordered_map<std::string, int>>
+        load_vocab(const std::string& file_path, bool reverse=false) {
     std::ifstream file(file_path);
     std::string line;
+
+    std::unordered_map<int, std::string> vocab;
+    std::unordered_map<std::string, int> vocab_reverse;
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << file_path << std::endl;
@@ -61,13 +57,23 @@ std::unordered_map<int, std::string> load_vocab(const std::string& file_path) {
         std::string word;
         int index;
 
-        if (std::getline(iss, word, '\t') && iss >> index) {
-            vocab[index] = word;
+        if (std::getline(iss, word, '\t') && iss >> index){
+            if (!reverse)
+                vocab[index] = word;
+            else
+                vocab_reverse[word] = index;
         }
     }
 
     file.close();
-    return vocab;
+    if (!reverse){
+        vocab_reverse.clear();
+        return vocab;
+    }
+    else{
+        vocab.clear();
+        return vocab_reverse;
+    }
 }
 
 
@@ -222,3 +228,10 @@ std::vector<float> load_audio_data(const std::string& filename) {
     return resampled_audio;
 }
 
+bool endsWith(const std::string& str, const std::string& suffix="@@") {
+    if (str.size() >= suffix.size()) {
+        return str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+    } else {
+        return false;
+    }
+}

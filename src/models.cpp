@@ -1,4 +1,9 @@
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+
 #include "models.h"
+#include "utils.h"
 
 
 const int MAX_LENGTH = 128;
@@ -8,8 +13,13 @@ const int WHISPER_EOS = 50257;
 const int WHISPER_VOC_SIZE = 51865;
 const int WHISPER_PROMPT_TOKEN_NUM = 3;
 
+const int64_t SOS = 1;
+const int64_t EOS = 2;
+const int64_t PAD = 0;
+
+
 void Translator::load_model(const std::string &model_path) {
-    session = Ort::Session(env, model_path.c_str(), ort_session_options);
+    session = Ort::Session(ort_env, model_path.c_str(), ort_session_options);
     Ort::AllocatorWithDefaultOptions ort_alloc;
 
     size_t num_inputs = session.GetInputCount();
@@ -33,8 +43,8 @@ void Translator::load_model(const std::string &model_path) {
     }
 }
 
-std::string Translator::infer(std::vector<int64_t>& encoder_input) {
-    std::string output;
+std::vector<int> Translator::infer(std::vector<int64_t>& encoder_input) {
+    std::vector<int> output;
 
     auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
     encoder_input_shapes = { 1, 128 };
@@ -67,7 +77,7 @@ std::string Translator::infer(std::vector<int64_t>& encoder_input) {
         decoder_input_shapes.clear();
         input_tensors.clear();
 
-        if (next_token != TRANSFORMER_EOS) output.append(voc_trg[static_cast<int>(next_token)] + " ");
+        if (next_token != TRANSFORMER_EOS) output.push_back(static_cast<int>(next_token));
 
         decoder_input.push_back(static_cast<int>(next_token));
         output_length_counter++;
@@ -81,7 +91,7 @@ std::string Translator::infer(std::vector<int64_t>& encoder_input) {
 }
 
 void Transcriber::load_model(const std::string &model_path) {
-    session = Ort::Session(env, model_path.c_str(), ort_session_options);
+    session = Ort::Session(ort_env, model_path.c_str(), ort_session_options);
     Ort::AllocatorWithDefaultOptions ort_alloc;
 
     size_t num_inputs = session.GetInputCount();
@@ -152,3 +162,142 @@ std::vector<int64_t> Transcriber::infer(std::vector<float> &encoder_input) {
 
     return output;
 }
+
+Tokenizer::Tokenizer(const std::string& src, const std::string& trg) {
+    src_lang = src;
+    trg_lang = trg;
+    std::string src_voc_path = root + "/../transformer_onnx/voc/voc_" + src_lang + ".txt";
+    std::string trg_voc_path = root + "/../transformer_onnx/voc/voc_" + trg_lang + ".txt";
+    trg_voc = std::get<std::unordered_map<int, std::string>>(load_vocab(trg_voc_path, false));
+    src_voc = std::get<std::unordered_map<int, std::string>>(load_vocab(src_voc_path, false));
+    reverse_trg_voc = std::get<std::unordered_map<std::string, int>>(load_vocab(trg_voc_path, true));
+    reverse_src_voc = std::get<std::unordered_map<std::string, int>>(load_vocab(src_voc_path, true));
+}
+
+Tokenizer::~Tokenizer() {
+    std::cout << "strings to translate are done processing." << std::endl;
+}
+
+std::string Tokenizer::preprocessing(const std::string& lines_to_translate) {
+    src_sentence = lines_to_translate;
+
+    std::vector<std::string> command_normalize = {
+            "perl", mosesdecoder_path + "/scripts/tokenizer/normalize-punctuation.perl", "-l", src_lang};
+    std::vector<std::string> command_tokenize = {
+            "perl", mosesdecoder_path + "/scripts/tokenizer/tokenizer.perl", "-l", src_lang};
+    std::vector<std::string> command_truecase = {
+            "perl", mosesdecoder_path + "/scripts/recaser/truecase.perl", "--model", vocab_path + "/truecase-model." + src_lang};
+    std::vector<std::string> command_apply_bpe = {
+            "python", vocab_path + "/apply_bpe.py", "-c", vocab_path + "/bpecode." + src_lang};
+
+    std::string result = lines_to_translate;
+    result = run_script(command_normalize, result);
+    result = run_script(command_tokenize, result);
+    result = run_script(command_truecase, result);
+    result = run_script(command_apply_bpe, result);
+
+    return result;
+}
+
+std::string Tokenizer::run_script(const std::vector<std::string>& script, const std::string& strings) {
+    std::string result;
+
+    std::string cmd = "echo '" + strings + "'" + " | ";
+    for (const auto& arg : script) {
+        cmd += arg + " ";
+    }
+    cmd += " 2>/dev/null";
+
+    // Execute the command and capture the output
+    std::array<char, 128> buffer{};
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+
+    if (!result.empty() && result.back() == '\n') {
+        result.pop_back();
+    }
+
+    return result;
+}
+
+std::vector<int64_t> Tokenizer::convert_token_to_id(const std::string& token_string) {
+    std::vector<std::string> tokens;
+    std::string temp_string;
+    for (const auto& e: token_string){
+        if (e != ' '){
+            temp_string += e;
+        }else{
+            tokens.push_back(temp_string);
+            temp_string.clear();
+        }
+    }
+    if (!temp_string.empty())
+        tokens.push_back(temp_string);
+
+    std::vector<int64_t> token_ids = {SOS};
+    for (const auto& token: tokens){
+        auto token_id =  static_cast<int64_t>(reverse_src_voc[token]);
+        token_ids.push_back(token_id);
+    }
+    token_ids.push_back(EOS);
+
+    size_t count = token_ids.size();
+    int PAD_NUM = MAX_LENGTH - static_cast<int>(count);
+    for (int i=0; i < PAD_NUM; ++i)
+        token_ids.push_back(PAD);
+
+    return token_ids;
+}
+
+std::vector<std::string> Tokenizer::convert_id_to_token(const std::vector<int>& token_ids) {
+    std::vector<std::string> tokens;
+    tokens.reserve(token_ids.size());
+    for (const auto& e: token_ids)
+        tokens.emplace_back(trg_voc[e]);
+
+    return tokens;
+}
+
+std::string Tokenizer::postprocessing(const std::vector<std::string>& tokens){
+    std::vector<std::string> command_detruecase = {
+            "perl", mosesdecoder_path + "/scripts/recaser/detruecase.perl"};
+    std::vector<std::string> command_detokenize = {
+            "perl", mosesdecoder_path + "/scripts/tokenizer/detokenizer.perl", "-l", trg_lang};
+
+    std::string glued_sentence;
+    std::string temp;
+    for (auto token: tokens){
+        if (endsWith(token)){
+            temp += token.substr(0, token.size() - 2);
+        }else{
+            if (!temp.empty())
+                token = temp.append(token);
+            glued_sentence += token + " ";
+            temp.clear();
+        }
+    }
+
+    std::string translated_sentence = glued_sentence;
+    translated_sentence = run_script(command_detruecase, translated_sentence);
+    translated_sentence = run_script(command_detokenize, translated_sentence);
+
+    return translated_sentence;
+}
+
+std::string Tokenizer::decode(const std::vector<int> &token_ids) {
+    std::vector<std::string> tokens = convert_id_to_token(token_ids);
+    std::string string = postprocessing(tokens);
+
+    char end_symbol = src_sentence[src_sentence.size() - 1];
+    string += end_symbol;
+
+    return string;
+}
+
