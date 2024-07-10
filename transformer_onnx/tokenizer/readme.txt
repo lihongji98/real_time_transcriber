@@ -1,0 +1,1 @@
+MosesDecoder and Subword-nmt are required to run the tokenizer.
