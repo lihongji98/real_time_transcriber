@@ -30,7 +30,7 @@ std::string translate(const auto& src_sentence){
     std::string model_path =  "../transformer_onnx/model/No-En-Transformer.onnx";
 
     Tokenizer tokenizer("no", "en");
-    std::cout << "tokenizer and translator are initialized..." <<  std::endl;
+    std::cout << "tokenize_tool and translator are initialized..." <<  std::endl;
     Translator translator;
 
     std::string s = tokenizer.preprocessing(src_sentence);
