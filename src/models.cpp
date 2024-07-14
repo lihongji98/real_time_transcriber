@@ -115,7 +115,7 @@ void Transcriber::load_model(const std::string &model_path) {
     }
 }
 
-std::vector<int64_t> Transcriber::infer(std::vector<float> &encoder_input) {
+std::vector<int64_t> Transcriber::infer(std::vector<float>& encoder_input) {
     std::vector<int64_t> output;
 
     auto memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
@@ -160,7 +160,7 @@ std::vector<int64_t> Transcriber::infer(std::vector<float> &encoder_input) {
         if ((next_token == WHISPER_EOS) || (output_length_counter > MAX_LENGTH)) break;
     }
 
-    return output;
+    return std::move(output);
 }
 
 Tokenizer::Tokenizer(const std::string& src, const std::string& trg) {
@@ -168,15 +168,25 @@ Tokenizer::Tokenizer(const std::string& src, const std::string& trg) {
     trg_lang = trg;
     std::string src_voc_path = root + "/../transformer_onnx/voc/voc_" + src_lang + ".txt";
     std::string trg_voc_path = root + "/../transformer_onnx/voc/voc_" + trg_lang + ".txt";
-    trg_voc = std::get<std::unordered_map<int, std::string>>(load_vocab(trg_voc_path, false));
-    src_voc = std::get<std::unordered_map<int, std::string>>(load_vocab(src_voc_path, false));
-    reverse_trg_voc = std::get<std::unordered_map<std::string, int>>(load_vocab(trg_voc_path, true));
-    reverse_src_voc = std::get<std::unordered_map<std::string, int>>(load_vocab(src_voc_path, true));
+
+    //move to heap
+    trg_voc = std::make_unique<std::unordered_map<int, std::string>>(
+            std::get<std::unordered_map<int, std::string>>(load_vocab(trg_voc_path, false))
+    );
+    src_voc = std::make_unique<std::unordered_map<int, std::string>>(
+            std::get<std::unordered_map<int, std::string>>(load_vocab(src_voc_path, false))
+    );
+
+    reverse_trg_voc = std::make_unique<std::unordered_map<std::string, int>>(
+            std::get<std::unordered_map<std::string, int>>(load_vocab(trg_voc_path, true))
+    );
+
+    reverse_src_voc = std::make_unique<std::unordered_map<std::string, int>>(
+            std::get<std::unordered_map<std::string, int>>(load_vocab(src_voc_path, true))
+    );
 }
 
-Tokenizer::~Tokenizer() {
-    std::cout << "strings to translate are done processing." << std::endl;
-}
+Tokenizer::~Tokenizer() = default;
 
 std::string Tokenizer::preprocessing(const std::string& lines_to_translate) {
     src_sentence = lines_to_translate;
@@ -209,15 +219,17 @@ std::string Tokenizer::run_script(const std::vector<std::string>& script, const 
     cmd += " 2>/dev/null";
 
     // Execute the command and capture the output
-    std::array<char, 128> buffer{};
+
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
 
     if (!pipe) {
         throw std::runtime_error("popen() failed!");
     }
 
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
+    constexpr size_t BUFFER_SIZE = 128;
+    std::unique_ptr<char[]> buffer = std::make_unique<char[]>(BUFFER_SIZE);
+    while (fgets(buffer.get(), BUFFER_SIZE, pipe.get()) != nullptr) {
+        result += buffer.get();
     }
 
     if (!result.empty() && result.back() == '\n') {
@@ -243,7 +255,7 @@ std::vector<int64_t> Tokenizer::convert_token_to_id(const std::string& token_str
 
     std::vector<int64_t> token_ids = {SOS};
     for (const auto& token: tokens){
-        auto token_id =  static_cast<int64_t>(reverse_src_voc[token]);
+        auto token_id =  static_cast<int64_t>(reverse_src_voc->at(token));
         token_ids.push_back(token_id);
     }
     token_ids.push_back(EOS);
@@ -260,7 +272,7 @@ std::vector<std::string> Tokenizer::convert_id_to_token(const std::vector<int>& 
     std::vector<std::string> tokens;
     tokens.reserve(token_ids.size());
     for (const auto& e: token_ids)
-        tokens.emplace_back(trg_voc[e]);
+        tokens.emplace_back(trg_voc->at(e));
 
     return tokens;
 }

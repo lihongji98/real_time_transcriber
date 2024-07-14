@@ -51,28 +51,35 @@ build cmake_object_order_depends_target_cpp_demo: phony || CMakeFiles/cpp_demo.d
 
 build CMakeFiles/cpp_demo.dir/src/main.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/main.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/main.cpp.o.d
-  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -fcolor-diagnostics
   INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
 build CMakeFiles/cpp_demo.dir/src/utils.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/utils.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/utils.cpp.o.d
-  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -fcolor-diagnostics
   INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
 build CMakeFiles/cpp_demo.dir/src/models.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/models.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/models.cpp.o.d
-  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -fcolor-diagnostics
   INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
 
 build CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/whisper_process.cpp || cmake_object_order_depends_target_cpp_demo
   DEP_FILE = CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o.d
-  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
+  OBJECT_DIR = CMakeFiles/cpp_demo.dir
+  OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
+
+build CMakeFiles/cpp_demo.dir/src/recorder.cpp.o: CXX_COMPILER__cpp_demo_unscanned_Debug /Users/lihongji/dev/Transcriber_cpp/src/recorder.cpp || cmake_object_order_depends_target_cpp_demo
+  DEP_FILE = CMakeFiles/cpp_demo.dir/src/recorder.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -fcolor-diagnostics
   INCLUDES = -I/Users/lihongji/dev/dependency/onnxruntime/include -I/Users/lihongji/dev/dependency/portaudio/include -I/Users/lihongji/dev/dependency/eigen -isystem /Users/lihongji/anaconda3/envs/ml/include/python3.11 -isystem /Users/lihongji/anaconda3/envs/ml/lib/python3.11/site-packages/numpy/core/include -isystem /opt/homebrew/include
   OBJECT_DIR = CMakeFiles/cpp_demo.dir
   OBJECT_FILE_DIR = CMakeFiles/cpp_demo.dir/src
@@ -85,8 +92,8 @@ build CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o: CXX_COMPILER__cpp_demo_
 #############################################
 # Link the executable cpp_demo
 
-build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o CMakeFiles/cpp_demo.dir/src/models.cpp.o CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib /opt/homebrew/lib/libsndfile.1.0.37.dylib /opt/homebrew/lib/libsamplerate.dylib
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+build cpp_demo: CXX_EXECUTABLE_LINKER__cpp_demo_Debug CMakeFiles/cpp_demo.dir/src/main.cpp.o CMakeFiles/cpp_demo.dir/src/utils.cpp.o CMakeFiles/cpp_demo.dir/src/models.cpp.o CMakeFiles/cpp_demo.dir/src/whisper_process.cpp.o CMakeFiles/cpp_demo.dir/src/recorder.cpp.o | /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib /opt/homebrew/lib/libsndfile.1.0.37.dylib /opt/homebrew/lib/libsamplerate.dylib
+  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk
   LINK_FLAGS = -Xlinker -undefined -Xlinker dynamic_lookup
   LINK_LIBRARIES = -Wl,-rpath,/Users/lihongji/dev/dependency/onnxruntime/lib -Wl,-rpath,/Users/lihongji/dev/dependency/portaudio/build -Wl,-rpath,/Users/lihongji/anaconda3/envs/ml/lib -Wl,-rpath,/opt/homebrew/lib  /Users/lihongji/dev/dependency/onnxruntime/lib/libonnxruntime.dylib  /Users/lihongji/dev/dependency/portaudio/build/libportaudio.dylib  /Users/lihongji/anaconda3/envs/ml/lib/libpython3.11.dylib  /opt/homebrew/lib/libsndfile.1.0.37.dylib  /opt/homebrew/lib/libsamplerate.dylib
   OBJECT_DIR = CMakeFiles/cpp_demo.dir

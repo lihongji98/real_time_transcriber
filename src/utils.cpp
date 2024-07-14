@@ -28,7 +28,6 @@ void softmax(std::vector<float>& input) {
     input = std::move(exp_values);
 }
 
-
 size_t argsort_max(const std::vector<float>& output_probs) {
     if (output_probs.empty()) {
         throw std::runtime_error("Vector is empty");
@@ -77,86 +76,6 @@ std::variant<std::unordered_map<int, std::string>,std::unordered_map<std::string
 }
 
 
-class PortAudioException : public std::runtime_error {
-public:
-    PortAudioException(PaError err) : std::runtime_error(Pa_GetErrorText(err)), error(err) {}
-    PaError error;
-};
-
-
-class PortAudioHandler {
-public:
-    PortAudioHandler() {
-        PaError err = Pa_Initialize();
-        if (err != paNoError) throw PortAudioException(err);
-    }
-    ~PortAudioHandler() {
-        Pa_Terminate();
-    }
-};
-
-
-std::vector<float> recordAudio(int durationSeconds) {
-    PortAudioHandler paHandler;
-    PaStream *stream = nullptr;
-    std::vector<float> recordedData;
-
-    try {
-        // Open an audio input stream
-        PaError err = Pa_OpenDefaultStream(&stream,
-                                           CHANNELS,          // input channels
-                                           0,                 // output channels
-                                           SAMPLE_FORMAT,
-                                           SAMPLE_RATE,
-                                           FRAMES_PER_BUFFER, // frames per buffer
-                                           nullptr,              // no callback, use blocking API
-                                           nullptr);             // no callback, so no user data
-        if (err != paNoError) throw PortAudioException(err);
-
-        // Use unique_ptr for automatic resource management
-        std::unique_ptr<PaStream, decltype(&Pa_CloseStream)> streamGuard(stream, Pa_CloseStream);
-
-        // Start the stream
-        err = Pa_StartStream(stream);
-        std::cout << "Start to record..." << std::endl;
-        if (err != paNoError) throw PortAudioException(err);
-
-        // Record audio data
-        int numBuffers = (SAMPLE_RATE * durationSeconds) / FRAMES_PER_BUFFER;
-        std::vector<float> buffer(FRAMES_PER_BUFFER);
-        for (int i = 0; i < numBuffers; ++i) {
-            err = Pa_ReadStream(stream, buffer.data(), FRAMES_PER_BUFFER);
-            if (err != paNoError) throw PortAudioException(err);
-            recordedData.insert(recordedData.end(), buffer.begin(), buffer.end());
-        }
-
-        // Stop the stream
-        std::cout << "Stop recording..." << std::endl;
-        err = Pa_StopStream(stream);
-        if (err != paNoError) throw PortAudioException(err);
-
-    } catch (const PortAudioException& e) {
-        fprintf(stderr, "PortAudio error: %s\n", e.what());
-        recordedData.clear();
-    }
-
-    return recordedData;
-}
-
-
-std::vector<float> processAudioData(const std::vector<float>& audioData) {
-    std::vector<float> processedAudio;
-    processedAudio.reserve(audioData.size());
-
-    std::transform(audioData.begin(), audioData.end(), std::back_inserter(processedAudio),
-                   [](float sample) {
-                       return std::clamp(sample, -1.0f, 1.0f);
-                   });
-
-    return processedAudio;
-}
-
-
 std::string read_file_string(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
@@ -170,7 +89,6 @@ std::string read_file_string(const std::string& filePath) {
 
     return buffer.str();
 }
-
 
 std::vector<float> load_audio_data(const std::string& filename) {
     SF_INFO sfinfo;

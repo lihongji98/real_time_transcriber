@@ -11,7 +11,7 @@
 
 class Transcriber {
 public:
-    Transcriber(const std::string& src_lang): ort_env(), runOptions(Ort::RunOptions()){};
+    Transcriber(): ort_env(), runOptions(Ort::RunOptions()){};
 
     void load_model(const std::string& model_path);
     std::vector<int64_t> infer(std::vector<float>& encoder_input);
@@ -33,12 +33,9 @@ private:
     std::vector<Ort::Value> input_tensors;
 };
 
-
 class Translator {
 public:
-    Translator():
-            ort_env(),
-            runOptions(Ort::RunOptions()){};
+    Translator():ort_env(), runOptions(Ort::RunOptions()){};
 
     void load_model(const std::string& model_path);
     std::vector<int> infer(std::vector<int64_t>& encoder_input);
@@ -57,7 +54,6 @@ private:
 
     std::vector<Ort::Value> input_tensors;
 };
-
 
 class Tokenizer{
 public:
@@ -82,16 +78,13 @@ private:
     std::string mosesdecoder_path = root + "/../transformer_onnx/tokenize_tool/mosesdecoder";
     std::string vocab_path = root + "/../transformer_onnx/voc";
 
-    std::unordered_map<int, std::string> src_voc;
-    std::unordered_map<int, std::string> trg_voc;
+    std::unique_ptr<std::unordered_map<int, std::string>> src_voc;
+    std::unique_ptr<std::unordered_map<int, std::string>> trg_voc;
 
-    std::unordered_map<std::string, int> reverse_src_voc;
-    std::unordered_map<std::string, int> reverse_trg_voc;
+    std::unique_ptr<std::unordered_map<std::string, int>> reverse_src_voc;
+    std::unique_ptr<std::unordered_map<std::string, int>> reverse_trg_voc;
 
     static std::string run_script(const std::vector<std::string>& script, const std::string& strings);
 };
-
-
-std::string transcribe(const std::vector<float>& audio_data);
 
 #endif //CPP_DEMO_MODELS_H

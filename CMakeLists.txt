@@ -29,6 +29,8 @@ add_executable(cpp_demo src/main.cpp
         src/models.h
         src/whisper_process.cpp
         src/whisper_process.h
+        src/recorder.cpp
+        src/recorder.h
 )
 
 target_link_libraries(cpp_demo "${ONNXRUNTIME_ROOT}/lib/libonnxruntime.dylib")
