@@ -4,10 +4,9 @@
 #include "recorder.h"
 
 
-const int SAMPLE_RATE = 16000;
-const int CHANNELS = 1;
-const int CHUNK_DURATION_SECONDS = 2;
-const int FRAMES_PER_BUFFER = 1024;
+static const int SAMPLE_RATE = 16000;
+static const int CHANNELS = 1;
+static const int FRAMES_PER_BUFFER = 1024;
 static constexpr float ENERGY_THRESHOLD = 3.0e-5f;
 static constexpr int SILENCE_FRAMES = SAMPLE_RATE * 1;
 

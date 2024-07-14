@@ -23,15 +23,17 @@ class Timer{
 public:
     std::chrono::time_point<std::chrono::steady_clock> start, end;
     std::chrono::duration<float> duration{};
+    std::string model;
 
-    Timer(){
+    Timer(const std::string& model_type){
         start = std::chrono::high_resolution_clock::now();
+        model = model_type;
     };
     ~Timer(){
         end = std::chrono::high_resolution_clock::now();
         duration = end - start;
 
         float ms = duration.count() * 1000.0f;
-        std::cout << "Timer took " << ms << " ms." << "\n";
+        std::cout << model << " took " << ms << " ms." << "\n";
     };
 };

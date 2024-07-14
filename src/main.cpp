@@ -25,6 +25,7 @@ std::unique_ptr<Transcriber> load_transcription_model(){
 }
 
 std::string transcribe(const std::vector<float>& audio_data, const std::unique_ptr<Transcriber>& transcriber){
+    Timer timer("whisper");
     std::string root = std::filesystem::current_path().string();
     const std::string python_preprocess_script = read_file_string(root + "/../whisper_onnx/scripts/process_script.py");
     const std::string python_decode_script = read_file_string(root + "/../whisper_onnx/scripts/decode_script.py");
@@ -52,6 +53,7 @@ ptr_wrapper load_translation_model(){
 std::string translate(const std::string& src_sentence,
                       const std::unique_ptr<Translator>& translator,
                       const std::unique_ptr<Tokenizer>& tokenizer){
+    Timer timer("transformer");
     if (src_sentence == "<|nocaptions|>")
         return "...";
 
@@ -82,16 +84,15 @@ int main() {
 
     recorder.start();
 
-    // Record for a certain duration or until user input
-//    std::this_thread::sleep_for(std::chrono::seconds(3));
-
     while (!shouldExit) {
         auto chunk = recorder.getChunk();
         if (!chunk.empty()) {
             std::string src_sentence = transcribe(chunk, transcriber_ptr);
             std::string trg_sentence = translate(src_sentence, translation_ptr, tokenizer_ptr);
             if (!(trg_sentence.empty()))
+                std::cout << "******************************************" << "\n";
                 std::cout << trg_sentence << std::endl;
+                std::cout << "******************************************" << "\n";
         }else{
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -100,10 +101,14 @@ int main() {
     recorder.stop();
 
     inputThread.join();
-//    int recordDurationSeconds = 5;
-//    std::vector<float> audio_data = recordAudio(recordDurationSeconds);
-//    std::vector<float> audio_data = processAudioData(audioData);
 
-//    std::vector<float> audio_data = load_audio_data("../demo.wav");
-//    std::cout << "wav file is loaded..." <<  std::endl;
+
+//    std::vector<float> audio_data_vector = load_audio_data("../demo1.wav");
+//    std::string src_sentence = transcribe(audio_data_vector, transcriber_ptr);
+//    std::string trg_sentence = translate(src_sentence, translation_ptr, tokenizer_ptr);
+//    if (!(trg_sentence.empty()))
+//        std::cout << "******************************************" << "\n";
+//        std::cout << trg_sentence << std::endl;
+//        std::cout << "******************************************" << "\n";
+
 }
