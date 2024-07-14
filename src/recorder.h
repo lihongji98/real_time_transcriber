@@ -24,7 +24,7 @@ public:
 
 class Recorder {
 public:
-    Recorder() : stream(nullptr), isRecording(false) {}
+    Recorder() : stream(nullptr), isRecording(false), silenceCounter(0) {}
     ~Recorder() {stop();}
     void start();
     void stop();
@@ -38,6 +38,12 @@ private:
     std::mutex bufferMutex;
 
     void recordingLoop();
+    static bool detectVoiceActivity(const std::vector<float>& buffer);
+    void processAudioChunk(std::vector<float>& chunk);
+
+
+    std::vector<float> currentChunk;
+    int silenceCounter;
 };
 
 std::vector<float> recordAudio(int durationSeconds);

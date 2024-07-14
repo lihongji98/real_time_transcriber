@@ -6,10 +6,13 @@
 
 const int SAMPLE_RATE = 16000;
 const int CHANNELS = 1;
-const int CHUNK_DURATION_SECONDS = 5;
+const int CHUNK_DURATION_SECONDS = 2;
 const int FRAMES_PER_BUFFER = 1024;
-const int BUFFERS_PER_CHUNK = (SAMPLE_RATE * CHUNK_DURATION_SECONDS) / FRAMES_PER_BUFFER;
+static constexpr float ENERGY_THRESHOLD = 3.0e-5f;
+static constexpr int SILENCE_FRAMES = SAMPLE_RATE * 1;
+
 const PaSampleFormat SAMPLE_FORMAT = paFloat32;
+
 
 
 PortAudioHandler::PortAudioHandler(){
@@ -68,18 +71,6 @@ std::vector<float> recordAudio(int durationSeconds) {
     return recordedData;
 }
 
-std::vector<float> processAudioData(const std::vector<float>& audioData) {
-    std::vector<float> processedAudio;
-    processedAudio.reserve(audioData.size());
-
-    std::transform(audioData.begin(), audioData.end(), std::back_inserter(processedAudio),
-                   [](float sample) {
-                       return std::clamp(sample, -1.0f, 1.0f);
-                   });
-
-    return processedAudio;
-}
-
 void Recorder::start() {
     if (isRecording) return;
 
@@ -125,37 +116,70 @@ void Recorder::stop() {
 std::vector<float> Recorder::getChunk() {
     std::vector<float> chunk;
     std::lock_guard<std::mutex> lock(bufferMutex);
+//    std::cout << audioBuffer.size() << " ";
     if (!audioBuffer.empty()) {
         chunk = std::move(audioBuffer.front());
         audioBuffer.pop();
-//        std::cout << audioBuffer.size() << std::endl;
     }
     return chunk;
 }
 
 void Recorder::recordingLoop() {
-    std::vector<float> chunkBuffer;
-    chunkBuffer.reserve(SAMPLE_RATE * CHUNK_DURATION_SECONDS);
     std::vector<float> buffer(FRAMES_PER_BUFFER);
+    bool isActive = false;
 
     while (isRecording) {
-        for (int i = 0; i < BUFFERS_PER_CHUNK; ++i) {
-            PaError err = Pa_ReadStream(stream, buffer.data(), FRAMES_PER_BUFFER);
-            if (err != paNoError) {
-                std::cerr << "PortAudio error: " << Pa_GetErrorText(err) << std::endl;
-                return;
+        PaError err = Pa_ReadStream(stream, buffer.data(), FRAMES_PER_BUFFER);
+        if (err != paNoError) {
+            std::cerr << "PortAudio error: " << Pa_GetErrorText(err) << std::endl;
+            return;
+        }
+        bool currentlyActive = detectVoiceActivity(buffer);
+//        std::cout << currentlyActive << " ";
+
+        if (currentlyActive) {
+            if (!isActive) {
+                isActive = true;
+                currentChunk.clear();
             }
-            chunkBuffer.insert(chunkBuffer.end(), buffer.begin(), buffer.end());
-        }
+            silenceCounter = 0;
+            currentChunk.insert(currentChunk.end(), buffer.begin(), buffer.end());
+//            std::cout << currentChunk.size() << " ";
+        } else {
+            if (isActive) {
+                silenceCounter += FRAMES_PER_BUFFER;
+                currentChunk.insert(currentChunk.end(), buffer.begin(), buffer.end());
 
-        std::lock_guard<std::mutex> lock(bufferMutex);
-        audioBuffer.push(std::move(chunkBuffer));
-        chunkBuffer.clear();
-        chunkBuffer.reserve(SAMPLE_RATE * CHUNK_DURATION_SECONDS);
-
-        // Optionally, limit the buffer size to prevent memory issues
-        while (audioBuffer.size() > 10) {
-            audioBuffer.pop();
+                if (silenceCounter >= SILENCE_FRAMES) {
+                    isActive = false;
+                    processAudioChunk(currentChunk);
+                    currentChunk.clear();
+                    silenceCounter = 0;
+                }
+            }
         }
+    }
+
+    // Process any remaining audio
+    if (!currentChunk.empty()) {
+        processAudioChunk(currentChunk);
+    }
+}
+
+bool Recorder::detectVoiceActivity(const std::vector<float> &buffer) {
+    float energy = 0.0f;
+    for (float sample : buffer) {
+        energy += sample * sample;
+    }
+    energy /= static_cast<float>(buffer.size());
+//    std::cout << energy << " ";
+    return energy > ENERGY_THRESHOLD;
+}
+
+void Recorder::processAudioChunk(std::vector<float> &chunk) {
+    std::lock_guard<std::mutex> lock(bufferMutex);
+    audioBuffer.push(std::move(chunk));
+    while (audioBuffer.size() > 100) {
+        audioBuffer.pop();
     }
 }

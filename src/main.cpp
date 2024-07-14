@@ -53,7 +53,7 @@ std::string translate(const std::string& src_sentence,
                       const std::unique_ptr<Translator>& translator,
                       const std::unique_ptr<Tokenizer>& tokenizer){
     if (src_sentence == "<|nocaptions|>")
-        return "";
+        return "...";
 
     std::string s = tokenizer->preprocessing(src_sentence);
     std::vector<int64_t> encoder_input = tokenizer->convert_token_to_id(s);
@@ -83,18 +83,18 @@ int main() {
     recorder.start();
 
     // Record for a certain duration or until user input
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+//    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     while (!shouldExit) {
         auto chunk = recorder.getChunk();
         if (!chunk.empty()) {
-            auto audio_chunk = processAudioData(chunk);
-            std::string src_sentence = transcribe(audio_chunk, transcriber_ptr);
+            std::string src_sentence = transcribe(chunk, transcriber_ptr);
             std::string trg_sentence = translate(src_sentence, translation_ptr, tokenizer_ptr);
             if (!(trg_sentence.empty()))
                 std::cout << trg_sentence << std::endl;
+        }else{
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     recorder.stop();
